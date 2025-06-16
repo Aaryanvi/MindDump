@@ -6,16 +6,16 @@ const ytFrame = document.getElementById("ytFrame");
 const breatheText = document.getElementById("breatheText");
 const moodSelector = document.getElementById("moodSelector");
 const moodButtons = document.querySelectorAll(".mood-btn");
+const auraText = document.getElementById("auraText");
 
-// New working YouTube video IDs for gentle sounds
+// Mood-based YouTube video IDs
 const moodAudio = {
-  rain: "cljv53Wvnx4",       // Rain
-  ocean: "PfQWMrLO3hQ",      // Gentle night waves :contentReference[oaicite:1]{index=1}
-  fireplace: "eyU3bRy2x44",  // Fireplace
-  forest: "1wn-OSiNVjE"      // Forest stream & bird song :contentReference[oaicite:2]{index=2}
+  rain: "cljv53Wvnx4",
+  fireplace: "eyU3bRy2x44",
+  forest: "1wn-OSiNVjE"
 };
 
-let selectedMood = "rain"; // default mood
+let selectedMood = "rain"; // Default
 
 // Mood selection logic
 moodButtons.forEach(btn => {
@@ -26,15 +26,11 @@ moodButtons.forEach(btn => {
   });
 });
 
-// Breathing cycle display
+// Breathing phases
 const phases = ["Inhale...", "Hold...", "Exhale...", "Hold..."];
 let phaseIndex = 0;
-setInterval(() => {
-  breatheText.textContent = phases[phaseIndex];
-  phaseIndex = (phaseIndex + 1) % phases.length;
-}, 3000);
 
-// Quotes list
+// Quotes for post-dump encouragement
 const quotes = [
   "Breathe in peace. Breathe out chaos.",
   "You did something good for yourself today.",
@@ -47,7 +43,6 @@ function getRandomQuote() {
   return quotes[Math.floor(Math.random() * quotes.length)];
 }
 
-// Display quote one word at a time
 function displayQuoteAnimated(text) {
   quote.innerHTML = "";
   text.split(" ").forEach((word, idx) => {
@@ -60,7 +55,29 @@ function displayQuoteAnimated(text) {
   });
 }
 
-// Dump button click handler
+// Modal to ask user if they want a body relaxation session
+function askForBodyScan() {
+  const confirmBox = document.createElement("div");
+  confirmBox.classList.add("modal");
+  confirmBox.innerHTML = `
+    <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
+      <p style="font-size: 1.2rem; color: #333;">Would you like to continue with a mini body relaxation session?</p>
+      <button id="yesBtn" style="margin: 10px;">Yes</button>
+      <button id="noBtn" style="margin: 10px;">No</button>
+    </div>
+  `;
+  document.body.appendChild(confirmBox);
+
+  document.getElementById("yesBtn").addEventListener("click", () => {
+    window.location.href = "relax.html"; // Redirect to relax page
+  });
+
+  document.getElementById("noBtn").addEventListener("click", () => {
+    confirmBox.remove();
+  });
+}
+
+// On "Dump" click: handle thought, show quote, start breathing
 dumpBtn.addEventListener("click", () => {
   const thought = thoughtInput.value.trim();
   if (!thought) {
@@ -68,22 +85,36 @@ dumpBtn.addEventListener("click", () => {
     return;
   }
 
-  // Hide mood selector icons
+  // Hide mood UI
   moodSelector.style.display = "none";
+  auraText.style.display = "none";
 
-  // Load and play selected mood's YouTube audio
-  const vid = moodAudio[selectedMood];
-  ytFrame.src = `https://www.youtube.com/embed/${vid}?autoplay=1&loop=1&playlist=${vid}`;
+  // Load appropriate relaxing audio
+  const videoId = moodAudio[selectedMood];
+  ytFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}`;
 
-  // Fade out thought input
+  // Animate and transition
   thoughtInput.style.animation = "fadeOut 1s forwards";
 
-  // Reveal output after fade-out
   setTimeout(() => {
     document.body.classList.add("calm");
     thoughtInput.classList.add("hidden");
     dumpBtn.classList.add("hidden");
     output.classList.remove("hidden");
+
     displayQuoteAnimated(getRandomQuote());
+
+    // 🔄 Start 1-minute breathing animation
+    let breatheCount = 0;
+    const breatheInterval = setInterval(() => {
+      breatheText.textContent = phases[phaseIndex];
+      phaseIndex = (phaseIndex + 1) % phases.length;
+      breatheCount++;
+
+      if (breatheCount === 20) { // 20 phases x 3s = 60s
+        clearInterval(breatheInterval);
+        askForBodyScan(); // After 1 minute, prompt user
+      }
+    }, 3000);
   }, 1000);
 });
