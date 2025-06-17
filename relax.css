@@ -1,9 +1,13 @@
+/* Relaxation Page Styles */
+
 body.relax-bg {
   margin: 0;
-  padding: 0;
+  padding: 40px;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(to bottom right, #6dd5ed, #2193b0);
-  color: white;
+  background: linear-gradient(-45deg, #d7f0fa, #c2e9fb, #fcd4d4, #ffdede);
+  background-size: 400% 400%;
+  animation: gradientFlow 20s ease infinite;
+  color: #2e3a59;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -11,16 +15,43 @@ body.relax-bg {
   text-align: center;
 }
 
+/* Relaxation Container */
 .relax-container {
-  padding: 30px;
-  max-width: 500px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 15px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  padding: 30px 40px;
+  max-width: 600px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
-#relaxText {
-  font-size: 1.4rem;
-  line-height: 2;
+/* Relaxation Heading */
+.relax-container h2 {
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #2b3a55;
+}
+
+/* Text displayed during relaxation steps */
+#scanText {
+  font-size: 1.5rem;
+  line-height: 1.8;
   white-space: pre-line;
+  color: #1c2c4c;
+  transition: opacity 0.6s ease;
+  min-height: 100px;
+}
+
+/* Optional: YouTube iframe is hidden but still plays */
+iframe {
+  display: none;
+}
+
+/* Animated Gradient Keyframes */
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
