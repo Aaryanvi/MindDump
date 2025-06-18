@@ -1,4 +1,18 @@
+// Twinkling Stars Generator
+const starField = document.getElementById('starField');
+
+for (let i = 0; i < 200; i++) {
+  const star = document.createElement('div');
+  star.classList.add('star');
+  star.style.top = `${Math.random() * 100}%`;
+  star.style.left = `${Math.random() * 100}%`;
+  star.style.animationDelay = `${Math.random() * 5}s`;
+  starField.appendChild(star);
+}
+
+// Relaxation Script
 const relaxText = document.getElementById("relaxText");
+const bgMusic = document.getElementById("bgMusic");
 
 const relaxSteps = [
   "Gently close your eyes...",
@@ -14,14 +28,71 @@ const relaxSteps = [
 ];
 
 let index = 0;
-relaxText.textContent = relaxSteps[index];
 
-const relaxInterval = setInterval(() => {
-  index++;
-  if (index < relaxSteps.length) {
-    relaxText.textContent = relaxSteps[index];
-  } else {
-    clearInterval(relaxInterval);
-    relaxText.textContent += "\n\n🌈 Session Complete. Take your time.";
+// Softly play background music
+bgMusic.volume = 0.3; // Low volume for gentle feel
+bgMusic.play();
+
+// Function to speak text softly
+function speakText(text) {
+  const synth = window.speechSynthesis;
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  utterance.rate = 0.9;
+  utterance.pitch = 1.2;
+  utterance.volume = 1;
+
+  const voices = synth.getVoices();
+  const softVoice = voices.find(v =>
+    v.name.includes("Female") ||
+    v.name.includes("Google UK English Female") ||
+    v.name.includes("Microsoft Zira") ||
+    v.lang === "en-GB"
+  );
+
+  if (softVoice) {
+    utterance.voice = softVoice;
   }
-}, 5000);
+
+  synth.speak(utterance);
+}
+
+// Ensure voices are loaded before starting
+if (speechSynthesis.getVoices().length === 0) {
+  speechSynthesis.onvoiceschanged = () => {
+    showStep();
+  };
+} else {
+  showStep();
+}
+
+// Function to show current step and speak it
+function showStep() {
+  if (index < relaxSteps.length) {
+    const step = relaxSteps[index];
+    relaxText.textContent = step;
+    speakText(step);
+    index++;
+    setTimeout(showStep, 12000); // 12s per step
+  } else {
+    relaxText.textContent += "\n\n🌈 Session Complete. Take your time.";
+    speakText("Your relaxation session is complete. Would you like to start again?");
+    askRestart();
+  }
+}
+
+// Ask user to restart or end
+function askRestart() {
+  setTimeout(() => {
+    const again = confirm("Would you like to start the relaxation again?");
+    if (again) {
+      index = 0;
+      showStep();
+    } else {
+      const goodbye = "Take this peace with you. You are strong. You are loved. 🌟";
+      relaxText.textContent = goodbye;
+      speakText(goodbye);
+      bgMusic.pause(); // Stop music when ending
+    }
+  }, 3000);
+}
